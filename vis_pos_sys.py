@@ -16,13 +16,13 @@ def crop_region(img, c_p,w,h):
     # apply the mask
     matched_region = cv2.bitwise_and(img, mask)
     font = cv2.FONT_HERSHEY_COMPLEX
+    
     if w < -10:
         x_decision = 'go right'
     elif w > 10 :
         x_decision = 'go left'
     else:
         x_decision= 'stay'
-
     if h < -10:
         h_decision = 'go right'
     elif h > 10 :
@@ -57,7 +57,6 @@ def features_matching(path_temp,path_train):
     search_params = dict(checks = 50)
 
     flann = cv2.FlannBasedMatcher(index_params, search_params)
-
     matches = flann.knnMatch(des1, des2, k=2)
 
     # store all the good matches (g_matches) as per Lowe's ratio
@@ -84,11 +83,13 @@ def features_matching(path_temp,path_train):
         print("Not enough matches have been found! - %d/%d" % (len(g_match), min_match))
         matchesMask = None
     cpoints=np.int32(dst)
+    
     # print(cpoints)
     a, b,c = cpoints.shape
 
     # reshape to standard format
     c_p=cpoints.reshape((b,a,c))
+    
     # print(c_p)
     # crop matching region
     wid_ch = str(c_p[0][2][0] / 2 - w/2)
@@ -104,9 +105,8 @@ def features_matching(path_temp,path_train):
         key = cv2.waitKey(1) & 0xFF
         if key == ord("q"):
             break
-
+            
     return (matching_region)
-
 
 def video_feauture(video_path):
 
@@ -119,6 +119,7 @@ def video_feauture(video_path):
     while 1:
         # img1 = cv2.imread(path_temp, 0)   # template
         r,img2 = cap.read()   # input image
+        
         # print(img2)
         img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
         img2 = cv2.resize(img2, (0, 0), fx=0.35, fy=0.35)
@@ -140,7 +141,7 @@ def video_feauture(video_path):
 
         g_match = []
         for m,n in matches:
-            if m.distance < 0.7 * n.distance:
+        if m.distance < 0.7 * n.distance:
                 g_match.append(m)
         if len(g_match)>min_match:
             src_pts = np.float32([ kps1[m.queryIdx].pt for m in g_match ]).reshape(-1,1,2)
@@ -180,6 +181,7 @@ def video_feauture(video_path):
             print('current : ' + str(c_p[0][2][0] / 2) + ' : ' + str(c_p[0][2][1] / 2))
             print('finc changes - width change : ' + str(c_p[0][2][0] / 2 - w/2) + ' height change : ' + str(c_p[0][2][1] / 2 - h/2) )
             font = cv2.FONT_HERSHEY_COMPLEX
+        
             if wid_ch < -10:
                 x_decision = 'go left'
             elif wid_ch > 10:
@@ -211,4 +213,4 @@ def video_feauture(video_path):
     cv2.destroyAllWindows()
 
 
-video_feauture('path/here')
+video_feauture('path/whereever')
